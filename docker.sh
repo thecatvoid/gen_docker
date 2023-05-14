@@ -20,7 +20,7 @@ rootch() {
         sudo mount --bind /run "${chroot}/run"
         sudo cp -L /etc/resolv.conf "${chroot}/etc/"
         sudo cp -a ./* "${chroot}/root/"
-        sudo chroot "${chroot}" /root/gentoo.sh "$@"
+        sudo chroot "${chroot}" /root/docker.sh "$@"
 }
 
 bashin() {
