@@ -58,7 +58,7 @@ compress_cmd() {
         unmount
         root="${HOME}/gentoo"
         sudo rm -rf "${root}"{/var/cache/,/var/tmp/portage/,/tmp/portage/,/var/db/repos/}
-        sudo tar cf - "$root" "${root}.tar" --strip-components=1 || true
+        sudo tar cpf - "$root" "${root}.tar" --strip-components=1 --xattrs-include='*.*' --numeric-owner || true
         pigz -cf -p "$(nproc --all)" "${root}.tar" > "${root}.tar.gz"
 
 }
