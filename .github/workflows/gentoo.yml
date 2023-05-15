@@ -23,8 +23,8 @@ jobs:
     - name: Build system
       run: ./docker.sh build
       
-    - name: Cleanup root
-      run: ./docker.sh clean
+    - name: Compress root
+      run: ./docker.sh compress
 
     - name: Upload docker image
       run: ./docker.sh upload

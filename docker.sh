@@ -28,6 +28,7 @@ bashin() {
 }
 
 setup_chroot() {
+        sudo apt update; sudo apt install -y pigz
         url="https://gentoo.osuosl.org/releases/amd64/autobuilds/current-stage3-amd64-desktop-systemd/"
         file="$(curl -s "$url" | grep -Eo 'href=".*"' | awk -F '>' '{print $1}' |
                 sed -e 's/href=//g' -e 's/"//g' | grep -o "stage3-amd64-desktop-systemd-$(date +%Y).*.tar.xz" | uniq)"
@@ -35,6 +36,7 @@ setup_chroot() {
         curl -sSL "${url}${file}" -o "/var/tmp/${file}"
         mkdir "$chroot"
         sudo tar -C "${chroot}" -xpf "/var/tmp/${file}" --xattrs-include='*.*' --numeric-owner 2>/dev/null
+        sudo rm -rf "/var/tmp/${file}"
 }
 
 setup_build_cmd() {
@@ -53,14 +55,17 @@ build_cmd() {
         emerge -uDN --with-bdeps=y @world || exit 1
 }
 
-clean_cmd() {
-        rm -rf /var/cache/
+compress_cmd() {
+        unmount
+        root="${HOME}/gentoo"
+        sudo rm -rf "${root}"{/var/cache/,/var/tmp/portage/,/tmp/portage/,/var/db/repos/}
+        sudo tar cf - "$root" "${root}.tar" --strip-components=1 || true
+        pigz -cf -p "$(nproc --all)" "${root}.tar" > "${root}.tar.gz"
+
 }
 
 upload() {
-        root="${HOME}/gentoo"
-        XZ_OPTS="-T0" sudo tar cJf "${root}.tar.xz" "${root}" --strip-components=1 || true
-        docker import "${root}.tar.xz" thecatvoid/gentoo:latest
+        docker import "gentoo.tar.gz" thecatvoid/gentoo:latest
         docker login -u thecatvoid -p "$PASS"
         docker push thecatvoid/gentoo:latest
 }
@@ -74,8 +79,8 @@ build() {
         rootch build_cmd
 }
 
-clean() {
-        rootch clean_cmd
+compress() {
+        rootch compress_cmd
 }
 
 # Exec functions when called as args
