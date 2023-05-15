@@ -59,7 +59,7 @@ clean_cmd() {
 
 upload() {
         root="${HOME}/gentoo"
-        XZ_OPTS="-T0" tar cJf "${root}.tar.xz" "${root}/*"
+        XZ_OPTS="-T0" tar cJf "${root}.tar.xz" "${root}" --strip-components=1
         docker import "${root}.tar.xz" thecatvoid/gentoo:latest
         docker login -u thecatvoid -p "$PASS"
         docker push thecatvoid/gentoo:latest
