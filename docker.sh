@@ -54,7 +54,7 @@ build_cmd() {
         emerge -uDN --with-bdeps=y @world || exit 1
 }
 
-compress_cmd() {
+compress() {
         unmount
         root="${HOME}/gentoo"
         sudo rm -rf "${root}"{/var/cache/,/var/tmp/portage/,/tmp/portage/,/var/db/repos/}
@@ -76,10 +76,6 @@ setup_build() {
 
 build() {
         rootch build_cmd
-}
-
-compress() {
-        rootch compress_cmd
 }
 
 # Exec functions when called as args
