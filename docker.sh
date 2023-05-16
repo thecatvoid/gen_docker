@@ -63,7 +63,7 @@ compress() {
 
 cleanup() {
         unmount
-        pri() { xargs -n"cores" sudo nice -n "-20" ionice -c "2" -n "0" taskset -c "0-7" "$@"; }
+        pri() { xargs -n"$cores" sudo nice -n "-20" ionice -c "2" -n "0" taskset -c "0-7" "$@"; }
         mkdir -p ./.null
         echo \
                 /usr/local/share/vcpkg \
