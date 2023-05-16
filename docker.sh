@@ -55,15 +55,13 @@ build_cmd() {
 }
 
 compress() {
-
-        sudo tar cpf "${root}.tar" "$root" --strip-components=1 --xattrs-include='*.*' --numeric-owner || true
-        pigz -cf -p "$(nproc --all)" "${root}.tar" > "${root}.tar.gz"
+        sudo tar cpf "${chroot}.tar" "$chroot" --strip-components=1 --xattrs-include='*.*' --numeric-owner --one-file-system || true
+        pigz -cf -p "$(nproc --all)" "${chroot}.tar" > "${chroot}.tar.gz"
 
 }
 
 cleanup() {
         unmount
-        root="${HOME}/gentoo"
         mkdir -p /tmp/null
         echo \
                 /usr/local/share/vcpkg \
@@ -145,14 +143,14 @@ cleanup() {
                 /usr/share/man \
                 /var/lib/apt/lists/* \
                 /var/cache/apt/archives/* \
-                "${root}"{/var/cache/,/var/tmp/portage/,/tmp/portage/,/var/db/repos/} \
+                "${chroot}"{/var/cache/,/var/tmp/portage/,/tmp/portage/,/var/db/repos/} \
                 | xargs -I{} rsync -avhP /tmp/null/ {}/ --delete
 
         docker rmi -f $(docker images -q) &>/dev/null
 }
 
 upload() {
-        docker import "gentoo.tar.gz" thecatvoid/gentoo:latest
+        docker import "${chroot}.tar.gz" thecatvoid/gentoo:latest
         docker login -u thecatvoid -p "$PASS"
         docker push thecatvoid/gentoo:latest
 }
