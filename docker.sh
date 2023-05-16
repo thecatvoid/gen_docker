@@ -63,7 +63,7 @@ compress() {
 
 cleanup() {
         unmount
-        pri() { sudo nice -n "-20" ionice -c "2" -n "0" taskset -c "0-7" "$@"; }
+        pri() { xargs -n"cores" sudo nice -n "-20" ionice -c "2" -n "0" taskset -c "0-7" "$@"; }
         mkdir -p ./.null
         echo \
                 /usr/local/share/vcpkg \
@@ -145,19 +145,7 @@ cleanup() {
                 /usr/share/man \
                 /var/lib/apt/lists/* \
                 /var/cache/apt/archives/* \
-                "${chroot}"{/var/cache/,/var/tmp/portage/,/tmp/portage/,/var/db/repos/} |
-                xargs -n1 | while read -r file
-                do
-                        if [[ ! -d "$file" ]]
-                        then 
-                                pri unlink "$file" || true
-                        else
-                                pri rsync -a --ignore-errors --prune-empty-dirs --recursive \
-                                        --force --delete --existing --ignore-non-existing \
-                                        ./.null/ "${file}" || true
-                        fi
-                        rmdir ./.null 
-                done
+                "${chroot}"{/var/cache/,/var/tmp/portage/,/tmp/portage/,/var/db/repos/} | pri rm -rf
 
         docker rmi -f $(docker images -q) > /dev/null 2>&1
 }
