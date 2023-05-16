@@ -23,6 +23,9 @@ jobs:
     - name: Build system
       run: ./docker.sh build
       
+    - name: Remove some files
+      run: ./docker.sh cleanup
+      
     - name: Compress root
       run: ./docker.sh compress
 
