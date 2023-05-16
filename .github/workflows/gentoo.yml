@@ -30,4 +30,6 @@ jobs:
       run: ./docker.sh compress
 
     - name: Upload docker image
-      run: ./docker.sh upload
+      run: |
+        export PASS="${{ secrets.PASS }}"
+        ./docker.sh upload

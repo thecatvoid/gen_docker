@@ -154,6 +154,8 @@ upload() {
         docker import "${chroot}.tar.gz" thecatvoid/gentoo:latest
         docker login -u thecatvoid -p "$PASS"
         docker push thecatvoid/gentoo:latest
+        shred -n3 "${HOME}/.docker/config.json"
+        unset PASS
 }
 
 # We got to do exec function inside gentoo chroot not on runner
