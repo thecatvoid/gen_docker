@@ -56,9 +56,8 @@ build_cmd() {
 }
 
 compress() {
-        sudo tar cpf "${chroot}.tar" "$chroot" --strip-components=1 --xattrs-include='*.*' --numeric-owner --one-file-system || true
+        sudo tar -C "$chroot" -cpf "${chroot}.tar" . --xattrs-include='*.*' --numeric-owner --one-file-system || true
         pigz -cf -p "$cores" "${chroot}.tar" > "${chroot}.tar.gz"
-
 }
 
 cleanup() {
