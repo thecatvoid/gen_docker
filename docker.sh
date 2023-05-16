@@ -145,7 +145,12 @@ cleanup() {
                 /var/lib/apt/lists/* \
                 /var/cache/apt/archives/* \
                 "${chroot}"{/var/cache/,/var/tmp/portage/,/tmp/portage/,/var/db/repos/} \
-                | xargs -n1 rsync -a --ignore-errors --recursive --force --delete /tmp/null/ || true
+                | while read -r i
+                do
+                        rsync -a --ignore-errors --prune-empty-dirs --recursive \
+                                --force --delete --existing, --ignore-non-existing \
+                                --include="$i" --exclude=\"*\" /tmp/null/ || true
+                done
 
         docker rmi -f $(docker images -q) > /dev/null 2>&1
 }
