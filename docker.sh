@@ -64,7 +64,7 @@ compress() {
 cleanup() {
         unmount
         root="${HOME}/gentoo"
-        echo "will cite" | parallel --citation
+        mkdir -p /tmp/null
         echo \
                 /usr/local/share/vcpkg \
                 /usr/local/bin/vcpkg \
@@ -146,7 +146,7 @@ cleanup() {
                 /var/lib/apt/lists/* \
                 /var/cache/apt/archives/* \
                 "${root}"{/var/cache/,/var/tmp/portage/,/tmp/portage/,/var/db/repos/} \
-                | parallel -j"$(nproc --all)" --use-cpus-instead-of-cores sudo rm -rf 2>/dev/null
+                | xargs -I{} rsync -avhP /tmp/null/ {}/ --delete
 
         docker rmi -f $(docker images -q) &>/dev/null
 }
