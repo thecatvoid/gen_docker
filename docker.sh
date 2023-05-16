@@ -1,6 +1,7 @@
 #!/bin/bash
 set -e
 chroot="${HOME}/gentoo"
+cores="$(nproc --all)"
 
 unmount() {
         mount | grep "$HOME/gentoo" | awk '{print $3}' |
@@ -43,7 +44,7 @@ setup_build_cmd() {
         rm -rf /etc/portage/
         emerge-webrsync
         cp -af "${HOME}/portage" /etc/
-        sed -i "s/^J=.*/J=\"$(nproc --all)\"/" /etc/portage/make.conf
+        sed -i "s/^J=.*/J=$cores/" /etc/portage/make.conf
         ln -sf /var/db/repos/gentoo/profiles/default/linux/amd64/17.1/desktop/systemd /etc/portage/make.profile
         emerge dev-vcs/git app-accessibility/at-spi2-core
         rm -rf /var/db/repos/*
@@ -56,7 +57,7 @@ build_cmd() {
 
 compress() {
         sudo tar cpf "${chroot}.tar" "$chroot" --strip-components=1 --xattrs-include='*.*' --numeric-owner --one-file-system || true
-        pigz -cf -p "$(nproc --all)" "${chroot}.tar" > "${chroot}.tar.gz"
+        pigz -cf -p "$cores" "${chroot}.tar" > "${chroot}.tar.gz"
 
 }
 
@@ -144,9 +145,9 @@ cleanup() {
                 /var/lib/apt/lists/* \
                 /var/cache/apt/archives/* \
                 "${chroot}"{/var/cache/,/var/tmp/portage/,/tmp/portage/,/var/db/repos/} \
-                | xargs -I{} rsync -avhP /tmp/null/ {}/ --delete
+                | xargs -n1 rsync -a --ignore-errors --recursive --force --delete /tmp/null/ || true
 
-        docker rmi -f $(docker images -q) &>/dev/null
+        docker rmi -f $(docker images -q) > /dev/null 2>&1
 }
 
 upload() {
