@@ -52,7 +52,7 @@ setup_build_cmd() {
 }
 
 build_cmd() {
-        emerge -uDN --with-bdeps=y @world || exit 1
+        emerge -uUDNe --with-bdeps=y @world || exit 1
 }
 
 compress() {
