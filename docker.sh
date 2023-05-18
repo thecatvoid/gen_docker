@@ -50,6 +50,8 @@ setup_build_cmd() {
         sed -i "s/^J=.*/J=$cores/" /etc/portage/make.conf
         ln -sf /var/db/repos/gentoo/profiles/default/linux/amd64/17.1/desktop/systemd /etc/portage/make.profile
         emerge dev-vcs/git app-accessibility/at-spi2-core
+        rm -rf /usr/src/linux
+        git clone --depth=1 "git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git" /usr/src/linux
         rm -rf /var/db/repos/*
         emerge --sync
 }
